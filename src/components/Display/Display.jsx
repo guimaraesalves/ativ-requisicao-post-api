@@ -1,15 +1,15 @@
 import { Container } from "./style";
 
-function Display({ status }) {
+export const Display = ({ status }) => {
   return (
-    <Container color={statusText === "OK" ? "green" : "red"}>
+    <Container>
       {status === "OK" ? (
-        <h2>Requisição completa</h2>
+        <h3>Requisição completa!</h3>
       ) : (
-        <h2>Requisição falhou</h2>
+        <h2>A Requisição falhou.</h2>
       )}
     </Container>
   );
 }
 
-export default Display;
+

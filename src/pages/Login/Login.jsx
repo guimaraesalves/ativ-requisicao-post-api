@@ -1,15 +1,15 @@
+import logo from "../../logo.svg";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import Display from "../../components/Display/Display";
-import api from "../../server/api";
-
-import api from "../../server/api";
-import { Switch, Route } from "react-router-dom";
+import { Display } from "../../components/Display/Display.jsx";
+import axios from "axios";
+import { useState } from "react";
+import { Container } from "./styles.js";
 
 function Login() {
   const schema = yup.object().shape({
-    Username: yup.string().required("Campo obrigatório"),
+    username: yup.string().required("Campo obrigatório"),
     password: yup.string().required("Campo obrigatório"),
   });
 
@@ -17,60 +17,43 @@ function Login() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm({
-    revolver: yupResolver(schema),
+    resolver: yupResolver(schema),
   });
 
   const [status, setStatus] = useState("");
 
   const handleSubmitAfter = (data) => {
-    api
-      .post("/sessions/", data)
+    axios
+      .post("https://kenzieshop.herokuapp.com/sessions/", data)
       .then((response) => {
-        reset(); //Limpa os campos
-
-        setStatus(response.status);
-        
+        console.log(response);
+        setStatus(response.statusText);
       })
       .catch((err) => {
-        toast.error("Requisição Falhou!");
+        setStatus("error");
       });
   };
 
-  const Input = ({ name, password, register, error, ...rest }) => {
-    console.log(rest);
-    return (
-      <>
-        <input {...register(name)} {...rest} />
-        <div>{error && <span>{error}</span>}</div>
-      </>
-    );
-  };
-
   return (
-    <div>
-      <Switch>
-        <Route exact path="/">
-          <form onSubmit={handleSubmit(handleSubmitAfter)}>
-            <Input
-              placeholder="Username"
-              register={register}
-              name="name"
-              error={errors.name?.message}
-            />
-            <Input
-              placeholder="Senha"
-              register={register}
-              name="password"
-              type="password"
-              error={errors.password?.message}
-            />
-            <button type="submit">Enviar</button>
-          </form>
-        </Route>
-      </Switch>
-    </div>
+    <>
+      <Container onSubmit={handleSubmit(handleSubmitAfter)}>
+        <img src={logo} className="App-logo" alt="logo" />
+        <h2>Tela de Login</h2>
+        <span>
+          <input type="text" placeholder="Username" {...register("username")} />
+          {errors.username?.message}
+          <input
+            password="password"
+            placeholder="Password"
+            {...register("password")}
+          />
+          {errors.password?.message}
+          <button type="submit">Login</button>
+        </span>
+      </Container>
+      {status && <Display status={status} />}
+    </>
   );
 }
 
